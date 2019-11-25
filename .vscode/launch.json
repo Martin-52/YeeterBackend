@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - YeeterWebBackendApplication",
+            "request": "launch",
+            "mainClass": "com.yeeter.web.YeeterWebBackend.YeeterWebBackendApplication",
+            "projectName": "YeeterWebBackend"
+        }
+    ]
+}

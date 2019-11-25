@@ -42,9 +42,9 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-		    <groupId>com.google.firebase</groupId>
-		    <artifactId>firebase-server-sdk</artifactId>
-		    <version>3.0.1</version>
+			<groupId>com.google.firebase</groupId>
+			<artifactId>firebase-admin</artifactId>
+			<version>6.11.0</version>
 		</dependency>
 	</dependencies>
 	<build>
