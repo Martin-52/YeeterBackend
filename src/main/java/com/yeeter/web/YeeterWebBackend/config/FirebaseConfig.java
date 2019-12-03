@@ -26,12 +26,12 @@ public class FirebaseConfig {
 
     @PostConstruct
     public FirebaseApp init() throws IOException {
-            FirebaseOptions options = new FirebaseOptions.Builder()
-                    .setCredentials(GoogleCredentials
-                            .fromStream(new ClassPathResource("/yeeter-backend.json").getInputStream()))
-                    .setDatabaseUrl("https://yeeter-backend.firebaseio.com/")
-                    .build();
-            
-            return FirebaseApp.initializeApp(options);
+        FirebaseOptions options = new FirebaseOptions.Builder()
+                .setCredentials(GoogleCredentials
+                        .fromStream(new ClassPathResource("/yeeter-backend.json").getInputStream()))
+                .setDatabaseUrl("https://yeeter-backend.firebaseio.com/")
+                .build();
+        
+        return FirebaseApp.initializeApp(options);
     }
 }
