@@ -2,10 +2,9 @@ package com.yeeter.web.YeeterWebBackend.service;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.UserRecord.UpdateRequest;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /*
     User Service class that we will use
@@ -13,14 +12,18 @@ import com.google.firebase.database.FirebaseDatabase;
     Whatever that may be.....
 */
 public class UserService {
-    FirebaseDatabase db = FirebaseDatabase.getInstance();
+    @Autowired
+    FirebaseDatabase db;
+
+    @Autowired
+    FirebaseAuth auth;
 
     public boolean uploadUser(String displayName, String uid) throws FirebaseAuthException {
 
         UpdateRequest req = new UpdateRequest(uid)
             .setDisplayName(displayName);
-        
-        FirebaseAuth.getInstance().updateUser(req);
+
+        auth.updateUser(req);
         return true;
     }
 
