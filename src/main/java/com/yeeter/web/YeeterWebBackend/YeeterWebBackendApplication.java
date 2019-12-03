@@ -15,7 +15,6 @@ import org.springframework.core.io.ClassPathResource;
 @SpringBootApplication
 public class YeeterWebBackendApplication {
 
-	static String db_url = "";
 	public static void main(String[] args) {
 		SpringApplication.run(YeeterWebBackendApplication.class, args);
 		
@@ -27,6 +26,9 @@ public class YeeterWebBackendApplication {
 					.build();
 			
 			FirebaseApp defaultApp = FirebaseApp.initializeApp(options);
+			FirebaseDatabase defaultDatabase = FirebaseDatabase.getInstance(defaultApp);
+			FirebaseAuth fireAuth = FirebaseAuth.getInstance(defaultApp);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
