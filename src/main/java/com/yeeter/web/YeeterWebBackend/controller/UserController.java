@@ -23,13 +23,13 @@ public class UserController {
     }
 
     @GetMapping("/user/usernameExists")
-    public boolean usernameExists(@PathVariable String username) throws InterruptedException {
-        return userService.usernameExists(username);
+    public boolean usernameExists() throws InterruptedException {
+        return userService.usernameExists("mlandin");
     }
 
     @GetMapping("/user/followUser")
-    public boolean followUser(@PathVariable String username, @PathVariable String uid) throws InterruptedException {
-        return userService.followUser(username, uid);
+    public void followUser(@PathVariable String username, @PathVariable String uid) throws InterruptedException {
+        userService.followUser(username, uid);
     }
 
     @GetMapping("/user/unfollowUser")
