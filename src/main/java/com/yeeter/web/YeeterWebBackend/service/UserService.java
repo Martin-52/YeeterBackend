@@ -28,6 +28,7 @@ public class UserService {
     FirebaseAuth auth;
 
     private boolean exists;
+    private boolean isFollowing;
     private String userId;
 
     public boolean uploadUser(String displayName, String uid) throws FirebaseAuthException {
@@ -67,12 +68,33 @@ public class UserService {
         addToUsersFollowers(usernameToId, currentUserId);
     }  
 
-    public boolean unfollowUser(String username, String uid){
-        return true;
+    public void unfollowUser(String usernameToUnfollow, String currentUserId) throws InterruptedException {
+        String usernameToId = getUserId(usernameToUnfollow);
+        removeFromCheckFollowing(currentUserId, usernameToUnfollow, usernameToId);
+        removeFromGetFollowing(currentUserId, usernameToUnfollow, usernameToId);
+        removeFromUsersFollowers(usernameToId, currentUserId);
     }
 
-    public boolean isFollowingUser(String username, String uid){
-        return true;
+    public boolean isFollowingUser(String usernameToCheck, String currentUserId) throws InterruptedException {
+        CountDownLatch done = new CountDownLatch(1);
+        DatabaseReference ref = db
+            .getReference("/check_following")
+            .child(currentUserId)
+            .child(usernameToCheck);
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                isFollowing = snapshot.exists();
+                done.countDown();
+            }
+            @Override
+            public void onCancelled(DatabaseError error) {
+            }
+
+        });
+        done.await();
+        return isFollowing;
     }
 
     private String getUserId(String username) throws InterruptedException {
@@ -111,10 +133,32 @@ public class UserService {
     }
     private void addToUsersFollowers(String usernameToId, String currentUserId){
         DatabaseReference ref = db
-            .getReference("/users_followers")
+            .getReference("/user_followers")
             .child(usernameToId)
             .child(currentUserId);
         ref.setValueAsync("User");
+    }
+
+    private void removeFromCheckFollowing(String currentUserId, String usernameToFollow, String userToFollowId){
+        DatabaseReference ref = db
+            .getReference("/check_following")
+            .child(currentUserId)
+            .child(usernameToFollow);
+        ref.removeValueAsync();
+    }
+    private void removeFromGetFollowing(String currentUserId, String usernameToFollow, String userToFollowId){
+        DatabaseReference ref = db
+            .getReference("/get_following")
+            .child(currentUserId)
+            .child(userToFollowId);
+        ref.removeValueAsync();
+    }
+    private void removeFromUsersFollowers(String usernameToId, String currentUserId){
+        DatabaseReference ref = db
+            .getReference("/user_followers")
+            .child(usernameToId)
+            .child(currentUserId);
+        ref.removeValueAsync();
     }
 
 

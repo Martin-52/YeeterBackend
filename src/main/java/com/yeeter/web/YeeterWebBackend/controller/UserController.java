@@ -5,7 +5,8 @@ import com.yeeter.web.YeeterWebBackend.service.UserService;
 import com.yeeter.web.YeeterWebBackend.service.YeetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -17,28 +18,28 @@ public class UserController {
     UserService userService;
 
     @GetMapping("/user/uploadUser")
-    public boolean uploadUser(@PathVariable String username, @PathVariable String uid)
+    public boolean uploadUser(@RequestParam String username, @RequestParam String uid)
             throws InterruptedException, FirebaseAuthException {
         return userService.uploadUser(username, uid);
     }
 
     @GetMapping("/user/usernameExists")
-    public boolean usernameExists() throws InterruptedException {
-        return userService.usernameExists("mlandin");
+    public boolean usernameExists(@RequestParam String username) throws InterruptedException {
+        return userService.usernameExists(username);
     }
 
-    @GetMapping("/user/followUser")
-    public void followUser(@PathVariable String username, @PathVariable String uid) throws InterruptedException {
+    @PostMapping("/user/followUser")
+    public void followUser(@RequestParam String username, @RequestParam String uid) throws InterruptedException {
         userService.followUser(username, uid);
     }
 
-    @GetMapping("/user/unfollowUser")
-    public boolean unfollowUser(@PathVariable String username, @PathVariable String uid) throws InterruptedException {
-        return userService.unfollowUser(username, uid);
+    @PostMapping("/user/unfollowUser")
+    public void unfollowUser(@RequestParam String username, @RequestParam String uid) throws InterruptedException {
+        userService.unfollowUser(username, uid);
     }
 
     @GetMapping("/user/isFollowingUser")
-    public boolean isFollowingUser(@PathVariable String username, @PathVariable String uid) throws InterruptedException {
+    public boolean isFollowingUser(@RequestParam String username, @RequestParam String uid) throws InterruptedException {
         return userService.isFollowingUser(username, uid);
     }
 }
