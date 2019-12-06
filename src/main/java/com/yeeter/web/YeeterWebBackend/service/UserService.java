@@ -5,12 +5,14 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord.UpdateRequest;
 import com.google.firebase.database.FirebaseDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /*
     User Service class that we will use
     to make changes to the user.
     Whatever that may be.....
 */
+@Service
 public class UserService {
     @Autowired
     FirebaseDatabase db;

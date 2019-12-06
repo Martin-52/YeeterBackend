@@ -3,6 +3,7 @@ package com.yeeter.web.YeeterWebBackend.service;
 import com.yeeter.web.YeeterWebBackend.model.Yeet;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
     numLikes, numDislikes, usersLikedList, usersDislikedList
     and any other operations that we may possible need to do.
 */
+@Service
 public class YeetService {
     @Autowired
     FirebaseDatabase db;
