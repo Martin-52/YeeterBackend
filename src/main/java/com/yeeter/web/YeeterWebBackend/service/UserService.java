@@ -14,8 +14,6 @@ import com.google.firebase.database.ValueEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import io.opencensus.stats.Aggregation.Count;
-
 /*
     User Service class that we will use
     to make changes to the user.
