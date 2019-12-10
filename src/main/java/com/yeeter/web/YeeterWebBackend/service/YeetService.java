@@ -28,7 +28,7 @@ public class YeetService {
 
     private List<Yeet> personalYeets = new ArrayList<>();
     private List<Yeet> followingYeets = new ArrayList<>();
-    private List<Yeet> tempYeets = new ArrayList<>();
+    private List<String> followingUsers = new ArrayList<>();
 
     // Post is body of Yeet.
     // Uid is user that is posting Yeet.
@@ -49,17 +49,20 @@ public class YeetService {
     public List<Yeet> getPersonalPosts(String currentUserId) throws InterruptedException {
         personalYeets.clear();
 
-        DatabaseReference ref = db.getReference("posts_by_user").child(currentUserId);
+        DatabaseReference ref = db.getReference("/posts_by_user").child(currentUserId);
         CountDownLatch done = new CountDownLatch(1);
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot);
                 for (DataSnapshot child : snapshot.getChildren()) {
-                    personalYeets.add(new Yeet((String) child.child("/yeet").getValue(), (String) child.getKey(),
-                            (String) child.child("/username").getValue(), (String) child.child("/userId").getValue(),
-                            (Long) child.child("/likes").getValue(), (Long) child.child("/dislikes").getValue()));
+                    personalYeets.add(new Yeet(
+                        (String) child.child("/yeet").getValue(),
+                        (String) child.getKey(),
+                        (String) child.child("/username").getValue(),
+                        (String) child.child("/userId").getValue(),
+                        (Long) child.child("/likes").getValue(),
+                        (Long) child.child("/dislikes").getValue()));
                 }
                 done.countDown();
             }
@@ -72,8 +75,12 @@ public class YeetService {
         return personalYeets;
     }
 
-    public List<Yeet> getFollowingPosts(String currentUserId) throws InterruptedException {
-        followingYeets.clear();
+    public List<Yeet> getFollowingPosts(String currentId) throws InterruptedException {
+        return getFollowingPostsHelper(getFollowingUsers(currentId));
+    }
+
+    private List<String> getFollowingUsers(String currentUserId) throws InterruptedException {
+        followingUsers.clear();
 
         DatabaseReference ref = db.getReference("/check_following").child(currentUserId);
         CountDownLatch done = new CountDownLatch(1);
@@ -81,13 +88,8 @@ public class YeetService {
 
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot);
                 for (DataSnapshot child : snapshot.getChildren()) {
-                    try {
-                        getFollowingPostsHelper((String) child.getValue());
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    followingUsers.add((String) child.getValue());
                 }
                 done.countDown();
             }
@@ -97,7 +99,7 @@ public class YeetService {
             }
         });
         done.await();
-        return followingYeets;
+        return followingUsers;
     }
 
     // public void managePostCounters(String yeetKey, String currentUserId, boolean like) {
@@ -105,43 +107,48 @@ public class YeetService {
     // }
     
     // Test starting from here. 
-    public void addUserToLikeList(String yeetKey, String currentUserId) {
-        DatabaseReference ref = db
-            .getReference("/posts_xlist")
-            .child(yeetKey)
+    public void addUserToLikeList(final String userId, final String postId) throws InterruptedException {
+        final DatabaseReference post_liked_list = (DatabaseReference) db
+            .getReference("/posts_xlists")
+            .child("/" + postId)
             .child("/users_liked")
-            .child(currentUserId);
-        ref.setValueAsync("Dummy Value");
+            .child(userId);
+            
+        post_liked_list.setValueAsync("dummyvalue");
     }
-    public void removeUserFromLikeList(String yeetKey, String currentUserId) {
-        DatabaseReference ref = db
-            .getReference("/posts_xlist")
-            .child(yeetKey)
+    public void removeUserFromLikeList(final String userId, final String postId) {
+        final DatabaseReference post_liked_list = db.getReference("/posts_xlists")
+            .child("/" + postId)
             .child("/users_liked")
-            .child(currentUserId);
+            .child(userId);
 
-        ref.removeValueAsync();
+        
+        post_liked_list.removeValueAsync();
     }
-    public void addUserToDislikeList(String yeetKey, String currentUserId) {
-        DatabaseReference ref = db
-            .getReference("/posts_xlist")
-            .child(yeetKey)
+    
+    public void addUserToDislikeList(final String userId, final String postId) throws InterruptedException {
+        final DatabaseReference post_disliked_list = db
+            .getReference("/posts_xlists")
+            .child("/" + postId)
             .child("/users_disliked")
-            .child(currentUserId);
-        ref.setValueAsync("Dummy Value");
+            .child(userId);
+    
+        post_disliked_list.setValueAsync("dummyvalue");
     }
-    public void removeUserFromDislikeList(String yeetKey, String currentUserId) {
-        DatabaseReference ref = db
-            .getReference("/posts_xlist")
-            .child(yeetKey)
+    
+    public void removeUserFromDislikeList(final String userId, final String postId) {
+        final DatabaseReference post_disliked_list = db
+            .getReference("/posts_xlists")
+            .child("/" + postId)
             .child("/users_disliked")
-            .child(currentUserId);
+            .child(userId);
 
-        ref.removeValueAsync();        
+        post_disliked_list.removeValueAsync();
     }
+
     public void addLike(String yeetKey, String currentUserId) {
         DatabaseReference ref = db
-            .getReference("/users_xlist")
+            .getReference("/users_xlists")
             .child(currentUserId)
             .child("/user_likes")
             .child(yeetKey);
@@ -149,7 +156,7 @@ public class YeetService {
     }
     public void removeLike(String yeetKey, String currentUserId) {
         DatabaseReference ref = db
-            .getReference("/users_xlist")
+            .getReference("/users_xlists")
             .child(currentUserId)
             .child("/user_likes")
             .child(yeetKey);
@@ -157,45 +164,49 @@ public class YeetService {
     }
     public void addDislike(String yeetKey, String currentUserId) {
         DatabaseReference ref = db
-            .getReference("/users_xlist")
+            .getReference("/users_xlists")
             .child(currentUserId)
             .child("/user_dislikes")
             .child(yeetKey);
-        ref.setValueAsync("Dummy Value");      
+        ref.setValueAsync("Dummy Value");
     }
     public void removeDislike(String yeetKey, String currentUserId) {
         DatabaseReference ref = db
-            .getReference("/users_xlist")
+            .getReference("/users_xlists")
             .child(currentUserId)
             .child("/user_dislikes")
             .child(yeetKey);
         ref.removeValueAsync();        
     }
 
-    private void getFollowingPostsHelper(String userId) throws InterruptedException {
-        DatabaseReference ref = db.getReference("posts_by_user").child(userId);
-        CountDownLatch done = new CountDownLatch(1);
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+    private List<Yeet> getFollowingPostsHelper(List<String> followingList) throws InterruptedException {
+        followingYeets.clear();
 
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot);
-                for(DataSnapshot child: snapshot.getChildren()){
-                    tempYeets.add(new Yeet(
-                        (String) child.child("/yeet").getValue(),
-                        (String) child.getKey(),
-                        (String) child.child("/username").getValue(), 
-                        (String) child.child("/userId").getValue(), 
-                        (Long) child.child("/likes").getValue(), 
-                        (Long) child.child("/dislikes").getValue()
-                    ));
+        for (String user : followingList) {
+            DatabaseReference ref = db.getReference("/posts_by_user").child(user);
+            CountDownLatch temp = new CountDownLatch(1);
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+    
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    for(DataSnapshot child: snapshot.getChildren()){
+                        followingYeets.add(new Yeet(
+                            (String) child.child("/yeet").getValue(),
+                            (String) child.getKey(),
+                            (String) child.child("/username").getValue(), 
+                            (String) child.child("/userId").getValue(), 
+                            (Long) child.child("/likes").getValue(), 
+                            (Long) child.child("/dislikes").getValue()
+                        ));
+                    }
+                    temp.countDown();
                 }
-                done.countDown();
-            }
-            @Override
-            public void onCancelled(DatabaseError error) {
-            }
-        });
-        done.await();
+                @Override
+                public void onCancelled(DatabaseError error) {
+                }
+            });
+            temp.await();
+        }
+    return followingYeets;
     }
 }
