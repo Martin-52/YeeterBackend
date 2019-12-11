@@ -31,12 +31,13 @@ public class UserService {
     private boolean isFollowing;
     private String userId;
 
-    public boolean uploadUser(String displayName, String uid) throws FirebaseAuthException {
+    public void uploadUser(String displayName, String uid) throws FirebaseAuthException {
 
         UpdateRequest req = new UpdateRequest(uid).setDisplayName(displayName);
-
         auth.updateUser(req);
-        return true;
+
+        DatabaseReference ref = db.getReference("/usernamesRef").child(displayName);
+        ref.setValueAsync(uid);
     }
 
     public boolean usernameExists(String username) throws InterruptedException {
