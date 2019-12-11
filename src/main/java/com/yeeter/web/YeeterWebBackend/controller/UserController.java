@@ -18,28 +18,28 @@ public class UserController {
     UserService userService;
 
     @GetMapping("/user/uploadUser")
-    public boolean uploadUser(@RequestParam String username, @RequestParam String uid)
+    public boolean uploadUser(@RequestParam("username") String username, @RequestParam("uid") String uid)
             throws InterruptedException, FirebaseAuthException {
         return userService.uploadUser(username, uid);
     }
 
     @GetMapping("/user/usernameExists")
-    public boolean usernameExists(@RequestParam String username) throws InterruptedException {
+    public boolean usernameExists(@RequestParam("username") String username) throws InterruptedException {
         return userService.usernameExists(username);
     }
 
     @PostMapping("/user/followUser")
-    public void followUser(@RequestParam String username, @RequestParam String uid) throws InterruptedException {
+    public void followUser(@RequestParam("username") String username, @RequestParam("uid") String uid) throws InterruptedException {
         userService.followUser(username, uid);
     }
 
     @PostMapping("/user/unfollowUser")
-    public void unfollowUser(@RequestParam String username, @RequestParam String uid) throws InterruptedException {
+    public void unfollowUser(@RequestParam("username") String username, @RequestParam("uid") String uid) throws InterruptedException {
         userService.unfollowUser(username, uid);
     }
 
     @GetMapping("/user/isFollowingUser")
-    public boolean isFollowingUser(@RequestParam String username, @RequestParam String uid) throws InterruptedException {
+    public boolean isFollowingUser(@RequestParam("username") String username, @RequestParam("uid") String uid) throws InterruptedException {
         return userService.isFollowingUser(username, uid);
     }
 }

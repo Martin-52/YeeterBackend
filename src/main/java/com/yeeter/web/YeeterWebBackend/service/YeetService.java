@@ -13,8 +13,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
-import com.yeeter.web.YeeterWebBackend.model.Yeet;
+import com.google.firebase.database.Transaction.Result;
 
 /*
     Yeet service class that will update a Yeets 
@@ -73,6 +75,43 @@ public class YeetService {
         });
         done.await();
         return personalYeets;
+    }
+
+    public void managePostCounters(final String userId, final String postKey, final String command){
+        final DatabaseReference posts_by_user = db
+            .getReference("/posts_by_user")
+            .child("/"+userId)
+            .child("/"+postKey);
+        posts_by_user.runTransaction(new Transaction.Handler(){
+            @Override
+            public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
+                // TODO Auto-generated method stub
+                // Int likeValue = currentData.child("/likes").getValue();
+                if (committed) {
+                    System.out.println("manage post counter commited");
+                    }
+            }
+            @Override
+            public Result doTransaction(MutableData currentData) {
+                // TODO Auto-generated method stub
+                String likeTemp = currentData.child("/likes").getValue().toString();
+                Integer likeValue = Integer.parseInt(likeTemp);
+
+                String dislikeTemp = currentData.child("/dislikes").getValue().toString();
+                Integer dislikeValue = Integer.parseInt(dislikeTemp);
+
+                if(command.equals("increase_likes")){
+                    currentData.setValue(likeValue+1);
+                } else if (command.equals("decrease_likes")){
+                    currentData.setValue(likeValue-1);
+                } else if (command.equals("increase_dislikes")){
+                    currentData.setValue(dislikeValue+1);
+                } else if (command.equals("decrease_dislikes")){
+                    currentData.setValue(dislikeValue-1);
+                }
+                return Transaction.success(currentData);
+            }
+        });
     }
 
     public List<Yeet> getFollowingPosts(String currentId) throws InterruptedException {

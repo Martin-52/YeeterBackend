@@ -124,6 +124,7 @@ public class UserService {
             .child(usernameToFollow);
         ref.setValueAsync(userToFollowId);
     }
+    
     private void addToGetFollowing(String currentUserId, String usernameToFollow, String userToFollowId){
         DatabaseReference ref = db
             .getReference("/get_following")
@@ -131,6 +132,7 @@ public class UserService {
             .child(userToFollowId);
         ref.setValueAsync(usernameToFollow);
     }
+
     private void addToUsersFollowers(String usernameToId, String currentUserId){
         DatabaseReference ref = db
             .getReference("/user_followers")
@@ -146,6 +148,7 @@ public class UserService {
             .child(usernameToFollow);
         ref.removeValueAsync();
     }
+
     private void removeFromGetFollowing(String currentUserId, String usernameToFollow, String userToFollowId){
         DatabaseReference ref = db
             .getReference("/get_following")
@@ -153,6 +156,7 @@ public class UserService {
             .child(userToFollowId);
         ref.removeValueAsync();
     }
+    
     private void removeFromUsersFollowers(String usernameToId, String currentUserId){
         DatabaseReference ref = db
             .getReference("/user_followers")
@@ -160,6 +164,4 @@ public class UserService {
             .child(currentUserId);
         ref.removeValueAsync();
     }
-
-
 }
