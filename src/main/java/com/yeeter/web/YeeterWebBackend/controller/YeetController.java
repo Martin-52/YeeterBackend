@@ -29,17 +29,12 @@ public class YeetController {
         yeetService.postYeet(post, uid, username);
     }
 
-    @PostMapping("/yeet/likeDislike")
-    public boolean likeDislike(@RequestParam("yeetKey") String yeetKey, @RequestParam("uid") String uid)
-            throws InterruptedException, FirebaseAuthException {
-        return yeetService.likeDislike(yeetKey, uid);
-    }
-
     @PostMapping("/yeet/addLike")
     public void addLike(@RequestParam("yeetKey") String yeetKey, @RequestParam("uid") String uid)
             throws InterruptedException, FirebaseAuthException {
         yeetService.addLike(yeetKey, uid);
-        yeetService.addUserToLikeList(yeetKey, uid);
+        yeetService.addUserToLikeList(yeetKey,uid);
+        yeetService.managePostCounters(uid, yeetKey, "increase_likes");
     }
 
     @PostMapping("/yeet/removeLike")
@@ -47,6 +42,7 @@ public class YeetController {
             throws InterruptedException, FirebaseAuthException {
         yeetService.removeLike(yeetKey, uid);
         yeetService.removeUserFromLikeList(yeetKey, uid);
+        yeetService.managePostCounters(uid, yeetKey, "decrease_likes");
     }
 
     @PostMapping("/yeet/addDislike")
@@ -54,6 +50,7 @@ public class YeetController {
             throws InterruptedException, FirebaseAuthException {
         yeetService.addDislike(yeetKey, uid);
         yeetService.addUserToDislikeList(yeetKey, uid);
+        yeetService.managePostCounters(uid, yeetKey, "increase_dislikes");
     }
 
     @PostMapping("/yeet/removeDislike")
@@ -61,6 +58,7 @@ public class YeetController {
             throws InterruptedException, FirebaseAuthException {
         yeetService.removeDislike(yeetKey, uid);
         yeetService.removeUserFromDislikeList(yeetKey, uid);
+        yeetService.managePostCounters(uid, yeetKey, "decrease_dislikes");
     }
 
     @GetMapping("/yeet/personalPosts")

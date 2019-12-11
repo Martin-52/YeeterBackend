@@ -44,9 +44,6 @@ public class YeetService {
         ref.child("/yeet").setValueAsync(yeet);
     }
 
-    public boolean likeDislike(String yeetKey, String uid) {
-        return true;
-    }
 
     public List<Yeet> getPersonalPosts(String currentUserId) throws InterruptedException {
         personalYeets.clear();
@@ -78,37 +75,47 @@ public class YeetService {
     }
 
     public void managePostCounters(final String userId, final String postKey, final String command){
+        //System.out.println("path given: /posts_by_user/" + userId + "/" + postKey + "\n With command: " + command);
+
         final DatabaseReference posts_by_user = db
             .getReference("/posts_by_user")
-            .child("/"+userId)
-            .child("/"+postKey);
+            .child(userId)
+            .child(postKey);
+            //.child("/likes");
         posts_by_user.runTransaction(new Transaction.Handler(){
             @Override
             public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
+                System.out.println("ON COMPLETE");
                 // TODO Auto-generated method stub
                 // Int likeValue = currentData.child("/likes").getValue();
+                //System.out.println("Data: "+ currentData.getValue().toString());
                 if (committed) {
                     System.out.println("manage post counter commited");
-                    }
+                }
             }
             @Override
             public Result doTransaction(MutableData currentData) {
-                // TODO Auto-generated method stub
-                String likeTemp = currentData.child("/likes").getValue().toString();
-                Integer likeValue = Integer.parseInt(likeTemp);
+                System.out.println("DO TRANSACTION NOGGA");
 
-                String dislikeTemp = currentData.child("/dislikes").getValue().toString();
-                Integer dislikeValue = Integer.parseInt(dislikeTemp);
+                Long likeValue = (Long)currentData.child("/likes").getValue();
+                Long dislikeValue = (Long)currentData.child("/dislikes").getValue();
 
-                if(command.equals("increase_likes")){
-                    currentData.setValue(likeValue+1);
-                } else if (command.equals("decrease_likes")){
-                    currentData.setValue(likeValue-1);
-                } else if (command.equals("increase_dislikes")){
-                    currentData.setValue(dislikeValue+1);
-                } else if (command.equals("decrease_dislikes")){
-                    currentData.setValue(dislikeValue-1);
+                System.out.println("likes: "+ likeValue);
+                System.out.println("dislikes: "+ dislikeValue);
+
+                if(likeValue!=null && dislikeValue!=null){
+                    if(command.equals("increase_likes")){
+                        System.out.println("INCREASING NOGGA");
+                        currentData.child("/likes").setValue(likeValue+1);
+                    } else if (command.equals("decrease_likes")){
+                        currentData.child("/likes").setValue(likeValue-1);
+                    } else if (command.equals("increase_dislikes")){
+                        currentData.child("/dislikes").setValue(dislikeValue+1);
+                    } else if (command.equals("decrease_dislikes")){
+                        currentData.child("/dislikes").setValue(dislikeValue-1);
+                    }
                 }
+
                 return Transaction.success(currentData);
             }
         });
@@ -141,23 +148,25 @@ public class YeetService {
         return followingUsers;
     }
 
+    
+
     // public void managePostCounters(String yeetKey, String currentUserId, boolean like) {
     //     DatabaseReference
     // }
     
     // Test starting from here. 
-    public void addUserToLikeList(final String userId, final String postId) throws InterruptedException {
-        final DatabaseReference post_liked_list = (DatabaseReference) db
+    public void addUserToLikeList( final String postId, final String userId) throws InterruptedException {
+        DatabaseReference post_liked_list = db
             .getReference("/posts_xlists")
-            .child("/" + postId)
+            .child(postId)
             .child("/users_liked")
             .child(userId);
             
         post_liked_list.setValueAsync("dummyvalue");
     }
-    public void removeUserFromLikeList(final String userId, final String postId) {
-        final DatabaseReference post_liked_list = db.getReference("/posts_xlists")
-            .child("/" + postId)
+    public void removeUserFromLikeList(final String postId, final String userId) {
+        DatabaseReference post_liked_list = db.getReference("/posts_xlists")
+            .child(postId)
             .child("/users_liked")
             .child(userId);
 
@@ -165,8 +174,8 @@ public class YeetService {
         post_liked_list.removeValueAsync();
     }
     
-    public void addUserToDislikeList(final String userId, final String postId) throws InterruptedException {
-        final DatabaseReference post_disliked_list = db
+    public void addUserToDislikeList(final String postId,final String userId) throws InterruptedException {
+        DatabaseReference post_disliked_list = db
             .getReference("/posts_xlists")
             .child("/" + postId)
             .child("/users_disliked")
@@ -175,7 +184,7 @@ public class YeetService {
         post_disliked_list.setValueAsync("dummyvalue");
     }
     
-    public void removeUserFromDislikeList(final String userId, final String postId) {
+    public void removeUserFromDislikeList(final String postId, final String userId) {
         final DatabaseReference post_disliked_list = db
             .getReference("/posts_xlists")
             .child("/" + postId)
