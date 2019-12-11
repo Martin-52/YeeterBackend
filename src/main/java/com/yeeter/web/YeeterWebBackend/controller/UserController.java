@@ -19,10 +19,10 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @GetMapping("/user/uploadUser")
-    public boolean uploadUser(@RequestParam("username") String username, @RequestParam("uid") String uid)
+    @PostMapping("/user/uploadUser")
+    public void uploadUser(@RequestParam("username") String username, @RequestParam("uid") String uid)
             throws InterruptedException, FirebaseAuthException {
-        return userService.uploadUser(username, uid);
+        userService.uploadUser(username, uid);
     }
 
     @GetMapping("/user/usernameExists")
