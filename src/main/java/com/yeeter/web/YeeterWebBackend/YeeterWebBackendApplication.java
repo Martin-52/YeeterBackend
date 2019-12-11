@@ -8,4 +8,5 @@ public class YeeterWebBackendApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(YeeterWebBackendApplication.class, args);
 	}
+	
 }
