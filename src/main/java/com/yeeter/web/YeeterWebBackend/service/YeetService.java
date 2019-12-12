@@ -1,5 +1,6 @@
 package com.yeeter.web.YeeterWebBackend.service;
 
+import com.yeeter.web.YeeterWebBackend.model.User;
 import com.yeeter.web.YeeterWebBackend.model.Yeet;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +34,10 @@ public class YeetService {
     private List<Yeet> personalYeets = new ArrayList<>();
     private List<Yeet> followingYeets = new ArrayList<>();
     private List<String> followingUsers = new ArrayList<>();
+    private List<String> followers = new ArrayList<>();
     private Set<String> userLiked = new HashSet<>();
     private Set<String> userDisliked = new HashSet<>();
+    private Long followersAmount = (long) 0;
 
     // Post is body of Yeet.
     // Uid is user that is posting Yeet.
@@ -320,5 +323,38 @@ public class YeetService {
             temp.await();
         }
     return followingYeets;
+    }
+
+    private Integer getLikesAmount(String userId) throws InterruptedException {
+        return getUserLiked(userId).size();
+    }
+
+    private Integer getDislikesAmount(String userId) throws InterruptedException {
+        return getUserDisliked(userId).size();
+    }
+
+    private Long getFollowersAmount(String userId) throws InterruptedException {
+        DatabaseReference ref = db.getReference("/user_followers").child(userId);
+        CountDownLatch temp = new CountDownLatch(1);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                followersAmount = snapshot.getChildrenCount();
+                temp.countDown();
+            }
+            @Override
+            public void onCancelled(DatabaseError error) {
+            }
+        });
+        
+        temp.await();
+        return followersAmount;
+    }
+
+
+    // public User(String username, String userId, Long likesAmount, Long dislikesAmount, Long followersAmount) {
+    public User retrieveUser(String userId, String username) throws InterruptedException {
+        return new User(userId,username,getLikesAmount(userId),getDislikesAmount(userId),getFollowersAmount(userId));
     }
 }

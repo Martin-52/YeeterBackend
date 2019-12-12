@@ -31,6 +31,8 @@ public class UserService {
     private boolean isFollowing;
     private String userId;
 
+    private YeetService yeetService;
+
     public void uploadUser(String displayName, String uid) throws FirebaseAuthException {
 
         UpdateRequest req = new UpdateRequest(uid).setDisplayName(displayName);
@@ -165,4 +167,6 @@ public class UserService {
             .child(currentUserId);
         ref.removeValueAsync();
     }
+
+    
 }

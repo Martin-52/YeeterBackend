@@ -5,6 +5,7 @@ import com.yeeter.web.YeeterWebBackend.service.YeetService;
 import java.util.List;
 
 import com.google.firebase.auth.FirebaseAuthException;
+import com.yeeter.web.YeeterWebBackend.model.User;
 import com.yeeter.web.YeeterWebBackend.model.Yeet;
 import com.yeeter.web.YeeterWebBackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,4 +73,12 @@ public class YeetController {
             throws InterruptedException, FirebaseAuthException {
         return yeetService.getFollowingPosts(uid);
     }
+
+    @GetMapping("/yeet/user")
+    public User getUser(@RequestParam("uid") String uid,@RequestParam("username") String username)
+            throws InterruptedException, FirebaseAuthException {
+        return yeetService.retrieveUser(uid, username);
+    }
+
+
 }
