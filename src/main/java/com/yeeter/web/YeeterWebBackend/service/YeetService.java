@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import com.google.firebase.database.DatabaseReference;
@@ -31,6 +33,8 @@ public class YeetService {
     private List<Yeet> personalYeets = new ArrayList<>();
     private List<Yeet> followingYeets = new ArrayList<>();
     private List<String> followingUsers = new ArrayList<>();
+    private Set<String> userLiked = new HashSet<>();
+    private Set<String> userDisliked = new HashSet<>();
 
     // Post is body of Yeet.
     // Uid is user that is posting Yeet.
@@ -122,7 +126,62 @@ public class YeetService {
     }
 
     public List<Yeet> getFollowingPosts(String currentId) throws InterruptedException {
+        getUserLiked(currentId);
+        userDisliked = getUserDisliked(currentId);
         return getFollowingPostsHelper(getFollowingUsers(currentId));
+    }
+
+    private Set<String> getUserLiked(String currentId) throws InterruptedException {
+        userLiked.clear();
+        DatabaseReference ref = db
+            .getReference("/users_xlists")
+            .child(currentId)
+            .child("/user_likes");
+        CountDownLatch done = new CountDownLatch(1);
+        
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for(DataSnapshot child: snapshot.getChildren()){
+                    userLiked.add((String) child.getKey());
+                }
+                done.countDown();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+            }
+        }); 
+        done.await();
+        System.out.println(userLiked);
+        return this.userLiked;
+    }
+    private Set<String> getUserDisliked(String currentId) throws InterruptedException {
+        userDisliked.clear();
+        DatabaseReference ref = db
+            .getReference("/users_xlists")
+            .child(currentId)
+            .child("/user_dislikes");
+        CountDownLatch done = new CountDownLatch(1);
+        
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for(DataSnapshot child: snapshot.getChildren()){
+                    userDisliked.add((String) child.getKey());
+                }
+                done.countDown();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+            }
+        }); 
+        done.await();
+        System.out.println(userDisliked);
+        return this.userDisliked;
     }
 
     private List<String> getFollowingUsers(String currentUserId) throws InterruptedException {
@@ -238,14 +297,19 @@ public class YeetService {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     for(DataSnapshot child: snapshot.getChildren()){
-                        followingYeets.add(new Yeet(
+                        Yeet temp = new Yeet(
                             (String) child.child("/yeet").getValue(),
                             (String) child.getKey(),
                             (String) child.child("/username").getValue(), 
                             (String) child.child("/userId").getValue(), 
                             (Long) child.child("/likes").getValue(), 
                             (Long) child.child("/dislikes").getValue()
-                        ));
+                        );
+                        
+                        temp.setUserLiked(userLiked.contains(temp.getKey()));
+                        temp.setUserDisliked(userDisliked.contains(temp.getKey()));
+                        followingYeets.add(temp);
+
                     }
                     temp.countDown();
                 }
