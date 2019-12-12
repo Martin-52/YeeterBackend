@@ -30,35 +30,35 @@ public class YeetController {
     }
 
     @PostMapping("/yeet/addLike")
-    public void addLike(@RequestParam("yeetKey") String yeetKey, @RequestParam("uid") String uid)
+    public void addLike(@RequestParam("yeetKey") String yeetKey, @RequestParam("uid") String uid, @RequestParam("postUserId") String postUserId)
             throws InterruptedException, FirebaseAuthException {
         yeetService.addLike(yeetKey, uid);
         yeetService.addUserToLikeList(yeetKey,uid);
-        yeetService.managePostCounters(uid, yeetKey, "increase_likes");
+        yeetService.managePostCounters(postUserId, yeetKey, "increase_likes");
     }
 
     @PostMapping("/yeet/removeLike")
-    public void removeLike(@RequestParam("yeetKey") String yeetKey, @RequestParam("uid") String uid)
+    public void removeLike(@RequestParam("yeetKey") String yeetKey, @RequestParam("uid") String uid, @RequestParam("postUserId") String postUserId)
             throws InterruptedException, FirebaseAuthException {
         yeetService.removeLike(yeetKey, uid);
         yeetService.removeUserFromLikeList(yeetKey, uid);
-        yeetService.managePostCounters(uid, yeetKey, "decrease_likes");
+        yeetService.managePostCounters(postUserId, yeetKey, "decrease_likes");
     }
 
     @PostMapping("/yeet/addDislike")
-    public void addDislike(@RequestParam("yeetKey") String yeetKey, @RequestParam("uid") String uid)
+    public void addDislike(@RequestParam("yeetKey") String yeetKey, @RequestParam("uid") String uid, @RequestParam("postUserId") String postUserId)
             throws InterruptedException, FirebaseAuthException {
         yeetService.addDislike(yeetKey, uid);
         yeetService.addUserToDislikeList(yeetKey, uid);
-        yeetService.managePostCounters(uid, yeetKey, "increase_dislikes");
+        yeetService.managePostCounters(postUserId, yeetKey, "increase_dislikes");
     }
 
     @PostMapping("/yeet/removeDislike")
-    public void removeDislike(@RequestParam("yeetKey") String yeetKey, @RequestParam("uid") String uid)
+    public void removeDislike(@RequestParam("yeetKey") String yeetKey, @RequestParam("uid") String uid, @RequestParam("postUserId") String postUserId)
             throws InterruptedException, FirebaseAuthException {
         yeetService.removeDislike(yeetKey, uid);
         yeetService.removeUserFromDislikeList(yeetKey, uid);
-        yeetService.managePostCounters(uid, yeetKey, "decrease_dislikes");
+        yeetService.managePostCounters(postUserId, yeetKey, "decrease_dislikes");
     }
 
     @GetMapping("/yeet/personalPosts")
